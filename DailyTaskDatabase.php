@@ -23,7 +23,7 @@ function GetTaskList(){
 
 function GetGoalList(){
     
-    $qur = mysql_query("select * from 'goals'");
+    $qur = mysql_query("select * from goals");
     $result = array();
     while($r = mysql_fetch_array($qur)){
     	extract($r);
@@ -54,20 +54,11 @@ function GetCityStatistics($id){
 
 
 function GetUser($username, $password){
-
-//     $qur = mysql_query("select * from `users` where 'name' = '".$username."'");
-// 	$result =array();
-// 	while($r = mysql_fetch_array($qur)){
-// 		extract($r);
-// 		$result[] = array("id" => $id, "name" => $name, "password" => $password); 
-// 	}
-// 	return $json = array("status" => 1, "info" => $result);
-
-    $qur = mysql_query("select * from users where name = '".$username."'");
+    $qur = mysql_query("select * from users where name = '".$username."' AND password = '".$password."'");
     $result = array();
     while($r = mysql_fetch_array($qur)){
     	extract($r);
-    	$result[] = array("id" => $id, "name" => $name); 
+    	$result[] = array("id" => $id, "name" => $name, "password" => $password); 
     }
     return $result;
 }

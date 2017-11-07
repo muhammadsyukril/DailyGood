@@ -1,6 +1,14 @@
- <link rel="stylesheet" type="text/css" href="style.css"> 
- <body>
 
+<?php
+    session_start();
+    if(empty($_SESSION['username'])){
+        header("location: Login.php");
+        
+    }
+    echo "Current user:" . $_SESSION['username']. "  Password: " . $_SESSION['password'];
+?>
+<link rel="stylesheet" type="text/css" href="style.css"> 
+<body>
 <div class=center>
     Daily good
     <br><br>
@@ -18,5 +26,12 @@
     
 
 
+
+
 </div>
 </body>
+
+<br><br>
+<form action="Logout.php">
+    <input type="submit" value="Logout"/>
+</form> 

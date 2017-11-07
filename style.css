@@ -2,6 +2,9 @@
     text-align: center;
     border: 3px solid blue;
 }
+.centerNoBorder {
+    text-align: center;
+}
 body {
     background-color: green;
     
