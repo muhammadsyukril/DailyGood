@@ -1,0 +1,28 @@
+#map {
+height: 600px;
+width: 100%;
+  max-width: 1000px;
+
+}
+#errorField {
+    color: #FE0101;
+}
+.fields {
+    width: 500px;
+    clear: both;
+      margin: auto;
+  right: 0;
+  left: 0;
+}
+.fields input {
+    width: 100%;
+    clear: both;
+  text-align:  center;
+}
+.center {
+  margin: auto;
+  right: 0;
+  left: 0;
+  max-width: 1000px;
+  text-align:  center;
+}
