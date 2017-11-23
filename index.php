@@ -5,7 +5,7 @@
         header("location: Login.php");
         
     }
-    echo "Current user:" . $_SESSION['username']. "  Password: " . $_SESSION['password'];
+    echo "Current user:" . $_SESSION['username']. "  Password: " . $_SESSION['password'] . "ID: " . $_SESSION['userid'];
 ?>
 <link rel="stylesheet" type="text/css" href="style.css"> 
 <body>

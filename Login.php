@@ -14,6 +14,7 @@
         if(count($userinfo) > 0){
             $_SESSION['username'] = $username;
             $_SESSION['password'] = $password;
+            $_SESSION['userid'] = $userinfo['id'];
             header("location: index.php");
             
         }
@@ -41,4 +42,12 @@
 </div>
 </body>
 
+<?php 
+    $userinfo = file_get_contents('https://software-as-a-service-wawethewaras.c9users.io/DailyTaskDatabase.php?action=getUserList');
+    $userinfo = json_decode($userinfo, true);
+    foreach($userinfo as $item) { //foreach element in $arr
+        echo "ID: ". $item["id"] . " Username: ". $item["name"] . " Password: ". $item["password"] ."<br>";
+    }
+
+?>
 
