@@ -1,8 +1,6 @@
 <?php
  // Include confi.php
- include_once('confi.php');
-// REST (Representational State Transfer) allows anything to work with your data // that can send a HTTP request
-
+include_once('confi.php');
 
 function GetUserList(){
     $db = new SQLite3('Database.db');
@@ -12,7 +10,6 @@ function GetUserList(){
 		$result[] = array("id" => $row['id'], "name" => $row['name'], 'password' => $row['password']); 
 	}
 	return $result;
-    
 }
 
 function GetUser($username, $password){
@@ -20,12 +17,21 @@ function GetUser($username, $password){
     $qur = $db->query("SELECT * FROM users WHERE name = '".$username."' AND password = '".$password."'");
 	$result = array();
 	while($row = $qur->fetchArray()){
-		$result = array("id" => $row['id'], "name" => $row['name'], 'password' => $row['password']); 
+		$result = array("id" => $row['id'], "name" => $row['name'], 'password' => $row['password'], 'city' => $row['city'], "status" => 0); 
+	}
+	if(empty($username)){
+	    $result = array("status" => 1, "error" => "Input username!");
+	}
+	else if(empty($password)){
+	    $result = array("status" => 1,"error" => "Input password!");
+	}
+	else if(count($result) <= 0){
+	    $result = array("status" => 1,"error" => "Wrong username or password!");
 	}
 	return $result;
-
 }
-function CreateUser($username, $password){
+
+function CreateUser($username, $password,$city){
     $result = GetUser($username, $password);
     $status = array();
     if(count($result) > 0){
@@ -33,15 +39,14 @@ function CreateUser($username, $password){
     }
     else{
         $db = new SQLite3('Database.db');
-        $qur = $db->query("INSERT INTO users  (name,password) VALUES ('".$username."', '".$password."');");
+        $db->query("INSERT INTO users  (name,password,city) VALUES ('".$username."', '".$password."', '".$city."');");
         $status = array("status" => 0); 
 
     }
-
     return $status;
 }
+
 function GetTaskList(){
-    
     $db = new SQLite3('Database.db');
     $qur = $db->query('SELECT * FROM tasks');
 	$result = array();
@@ -49,11 +54,9 @@ function GetTaskList(){
 		$result[] = array("id" => $row['id'], "name" => $row['name'], "scoretogive" => $row['scoretogive']); 
 	}
 	return $result;
-    
 }
 
 function GetTask($taskid){
-    
     $db = new SQLite3('Database.db');
     $qur = $db->query('SELECT * FROM tasks WHERE id = '. $taskid);
 	$result = "";
@@ -61,18 +64,23 @@ function GetTask($taskid){
 		$result = array("id" => $row['id'], "name" => $row['name'], "scoretogive" => $row['scoretogive']); 
 	}
 	return $result;
-    
 }
-function GetRandomTask(){
-	$taskCount = count(GetTaskList());
-	$randomint = rand(0, $taskCount-1);
-	$randomtask = GetTask($randomint);
-	return $randomtask;
-    
+
+function GetRandomTasks($count){
+    $taskList = GetTaskList();
+    shuffle($taskList);
+    $taskListLenght = count($taskList);
+    if($count > $taskListLenght){
+        $count = $taskListLenght;
+    }
+    $tasks = array();
+    for($i = 0;$i < $count;$i++){
+        $tasks[] = $taskList[$i];
+    }
+    return $tasks;
 }
 
 function GetGoalList(){
-    
     $db = new SQLite3('Database.db');
     $qur = $db->query('SELECT * FROM goals');
 	$result = array();
@@ -80,17 +88,28 @@ function GetGoalList(){
 		$result[] = array("id" => $row['id'], "name" => $row['name'], "scoretogive" => $row['scoretogive']); 
 	}
 	return $result;
-
 }
 
 function GetGoal($goalid){
-    
     $db = new SQLite3('Database.db');
     $qur = $db->query('SELECT * FROM goals WHERE id = '. $goalid);
 	$result = "";
 	while($row = $qur->fetchArray()){
 		$result = array("id" => $row['id'], "name" => $row['name'], "scoretogive" => $row['scoretogive']); 
 	}
+	return $result;
+}
+
+function GetUserGoals($userid){
+    CreateUserGoalIfNotExist($userid);
+
+    $db = new SQLite3('Database.db');
+    $qur = $db->query("SELECT * FROM usergoal INNER JOIN goals ON usergoal.goalid = goals.id WHERE userid = '".$userid."'");
+	$result = array();
+	while($row = $qur->fetchArray()){
+		$result[] = array("userid" => $row['userid'], "name" => $row['name'], "goalid" => $row['goalid'], "status" => $row['status'], "error" => ""); 
+	}
+	
 	return $result;
     
 }
@@ -102,46 +121,45 @@ function GetUserTask($userid){
     $qur = $db->query("SELECT * FROM usertasks WHERE userid = '".$userid."'");
 	$result = array();
 	while($row = $qur->fetchArray()){
-		$result = array("userid" => $row["userid"], "task1" => $row['taskid1'],"task2" => $row['taskid2'],"task3" => $row['taskid3'], "date" => $row['date'], "time" => $row['time']); 
+		$result = array("userid" => $row['userid'], "task0" => $row['taskid0'],"task1" => $row['taskid1'],"task2" => $row['taskid2'], "resetdate" => $row['resetdate'], "error" => ""); 
 	}
 	
-	//if date > seuraava päivä then get new tasks
-	
+   $result = ResetTasksIfOverLimit($result);
 	return $result;
     
 }
 
+function ResetTasksIfOverLimit($result){
+    if(strtotime("now") > $result['resetdate']){
+    //if($result['resetdate'] > strtotime("now")){
+        $tasks = getRandomTasks(3);
+        $resetdate = strtotime("+1 day");
+        $userid = $result["userid"];
+        $db = new SQLite3('Database.db');
+        $qur = $db->query("UPDATE usertasks SET taskid0 = ".$tasks[0]["id"].",taskid1 = ".$tasks[1]["id"].",taskid2 = ".$tasks[2]["id"].", resetdate = ".$resetdate." WHERE userid = ".$result['userid']);
 
+        $db->query("UPDATE usertask SET status = 0 WHERE userid = ".$userid);
 
-function GetCityStatistics($id){
-    
-    $student_info = array();
-    
-    // Data that normally is pulled from a database
-    switch($id){
         
-        case "Lahti":
-            $student_info = array("taskname" => "Do laundry", "score" => 0); 
-            break;
-        case "Lappeenranta":
-            $student_info = array("taskname" => "Do laundry", "score" => 2); 
-            break;
-    }
-     $student_info = array("taskname" => "Do laundry", "score" => 2); 
-    return $student_info;
-    
+        $result = array("userid" => $result["userid"], "task0" => $tasks[0]["id"],"task1" => $tasks[1]["id"],"task2" => $tasks[2]["id"], "resetdate" => $date, "error" => "Tasks reseted!"); 
+    } 
+    return $result;
+}
+function ResetTasks($userid){
+    $db = new SQLite3('Database.db');
+    $db->query("UPDATE usertask SET status = 0 WHERE userid = ".$userid);
+    return array();
+
 }
 
 
-
-
-function GetTaskStatus($username, $taskid){
+function GetTaskStatus($userid, $taskid){
     $db = new SQLite3('Database.db');
-    $qur = $db->query("INSERT OR IGNORE INTO usertask  (userid,taskid) VALUES ('".$username."', '".$taskid."');");
-    $qur = $db->query("SELECT * FROM usertask WHERE userid = '".$username."' AND taskid = '".$taskid."'");
+    $qur = $db->query("INSERT OR IGNORE INTO usertask  (userid,taskid) VALUES ('".$userid."', '".$taskid."');");
+    $qur = $db->query("SELECT * FROM usertask INNER JOIN tasks ON usertask.taskid = tasks.id  WHERE userid = '".$userid."' AND taskid = '".$taskid."'");
 	$result = array();
 	while($row = $qur->fetchArray()){
-		$result = array('status' => $row['status']); 
+		$result = array('status' => $row['status'], 'name' => $row['name']); 
 	}
 	return $result;
 
@@ -155,6 +173,42 @@ function SetTaskStatus($userid, $taskid){
     $scoreToGive = 0;
 
 
+	while($row = $qur->fetchArray()){
+		$result = array('status' => $row['status']); 
+	}
+	if(count($result) == 0){
+	    return array('status' => 0); 
+	}
+	else {
+	    $qur = $db->query("SELECT * FROM userinfo WHERE userid = '".$userid."'");
+    	while($row = $qur->fetchArray()){
+		    $score = $row['score']; 
+	    }
+	    $qur = $db->query("SELECT * FROM tasks WHERE id = '".$taskid."'"); 
+    	while($row = $qur->fetchArray()){
+		    $scoreToGive = $row['scoretogive']; 
+	    }
+	    
+
+	    
+	    $scoreToGive = $score + $scoreToGive;
+	    $qur = $db->query("UPDATE userinfo SET score = ".$scoreToGive." WHERE userid = '".$userid."'");
+	    
+	}
+	
+    $result = array('status' => $row['status'], "score" => $score, "scoretogive" => $scoreToGive);
+
+	return $result;
+
+}
+function CompleteGoal($userid, $goalid){
+    CreateUserGoalIfNotExist($userid);
+    $db = new SQLite3('Database.db');
+    $qur = $db->query("UPDATE usergoal SET status = 1 WHERE userid = '".$userid."' AND goalid = '".$goalid."'");
+    $qur = $db->query("SELECT * FROM usergoal WHERE userid = '".$userid."' AND goalid = '".$goalid."'");
+	$result = array();
+    $score = 0;
+    $scoreToGive = 0;
 
 	while($row = $qur->fetchArray()){
 		$result = array('status' => $row['status']); 
@@ -167,7 +221,7 @@ function SetTaskStatus($userid, $taskid){
     	while($row = $qur->fetchArray()){
 		    $score = $row['score']; 
 	    }
-	    $qur = $db->query("SELECT * FROM tasks WHERE taskid = '".$taskid."'"); 
+	    $qur = $db->query("SELECT * FROM goals WHERE id = '".$taskid."'"); 
     	while($row = $qur->fetchArray()){
 		    $scoreToGive = $row['scoretogive']; 
 	    }
@@ -178,10 +232,23 @@ function SetTaskStatus($userid, $taskid){
 	    $qur = $db->query("UPDATE userinfo SET score = ".$scoreToGive." WHERE userid = '".$userid."'");
 	    
 	}
-    $result = array('status' => $row['status'], "score" => $score, "scoretogive" => $scoreToGive);
+	
+    $result = array('status' => 1, "score" => $score, "scoretogive" => $scoreToGive);
 
 	return $result;
 
+}
+
+function CreateUserGoalIfNotExist($userid){
+    $goalList = getGoalList();
+    $db = new SQLite3('Database.db');
+    foreach($goalList as $goal){
+        $qur = $db->query("INSERT OR IGNORE INTO usergoal  (userid,goalid) VALUES ($userid ,". $goal['id'].");");
+    }
+    $status = array("status" => 0); 
+
+
+    return $status;
 }
 
 function CreateTaskUserIfNotExist($userid){
@@ -195,18 +262,13 @@ function CreateTaskUserIfNotExist($userid){
     $status = array();
     date_default_timezone_set('Europe/Helsinki');
     $note = $_POST["message"];
-    $date = date("d.m.y");
-    $time = date("H:i");
-    
-    $tasks = array();
-    $tasklistLength = count(GetTaskList());
-    $tasks["task1"] = rand(0,$tasklistLength-1);
-    $tasks["task2"] = rand(0,$tasklistLength-1);
-    $tasks["task3"] = rand(0,$tasklistLength-1);
-    
+    $resetdate = strtotime("+1 day");
+
+    $tasks = getRandomTasks(3);
+
     if(count($result) == 0){
         $db = new SQLite3('Database.db');
-        $qur = $db->query("INSERT INTO usertasks  (userid,taskid1,taskid2,taskid3,date,time) VALUES ($userid , ".$tasks["task1"].", ". $tasks["task2"] .",". $tasks["task3"] .",'$date', '$time');");
+        $qur = $db->query("INSERT INTO usertasks  (userid,taskid0,taskid1,taskid2,resetdate) VALUES ($userid , ".$tasks[0]["id"].", ". $tasks[1]["id"] .",". $tasks[2]["id"] .",'$resetdate');");
         $status = array("status" => 0); 
 
     }
@@ -216,18 +278,33 @@ function CreateTaskUserIfNotExist($userid){
 
 function GetUserInfo($userid){
     $db = new SQLite3("Database.db");
-    $qur = $db->query("INSERT OR IGNORE INTO userinfo  (userid,city) VALUES ('".$userid."', 'Lahti');");
-    $qur = $db->query("SELECT * FROM userinfo WHERE userid = ". $userid);
+    $qur = $db->query("INSERT OR IGNORE INTO userinfo  (userid) VALUES ('".$userid."');");
+    $qur = $db->query("SELECT * FROM users INNER JOIN userinfo ON users.id = userinfo.userid WHERE users.id = ". $userid);
     while($row = $qur->fetchArray()){
         $result = array("score" => $row["score"], "city" => $row["city"], "completedtasks" => $row["completedtasks"], "completedgoals" => $row["completedgoals"]);
     }
     return $result;
 }
 
+function GetCityScore($city){
+    $db = new SQLite3("Database.db");
+    $qur = $db->query("SELECT * FROM users LEFT OUTER JOIN userinfo ON users.id = userinfo.userid where city = '". $city."'");
+
+    $score = 0;
+    $count = 0;
+	while($row = $qur->fetchArray()){
+		$count++;
+		$score += $row["score"];
+	}
+	
+	$result = array("totalscore" => $score, "usercount" => $count);
+	return $result;
+}
+
 // Execute the proper method above based on request
 
 if(isset($_GET["action"])){
-    
+    date_default_timezone_set('Europe/Helsinki');
     switch($_GET["action"]){
         
         case "getTaskList":
@@ -239,14 +316,11 @@ if(isset($_GET["action"])){
         case "getUserList":
             $value = GetUserList();
             break;
-        case "getCityStatistics":
-            $value = GetCityStatistics($_GET["city"]);
-            break;
         case "getUser":
             $value = GetUser($_GET["username"],$_GET["password"]);
             break;
         case "createUser":
-            $value = CreateUser($_GET["username"],$_GET["password"]);
+            $value = CreateUser($_GET["username"],$_GET["password"],$_GET["city"]);
             break;
         case "getUserTask":
             $value = GetUserTask($_GET["userid"]);
@@ -257,12 +331,25 @@ if(isset($_GET["action"])){
         case "getTask":
             $value = GetTask($_GET["taskid"]);
             break;
+        case "getRandomTasks":
+            $value = GetRandomTasks($_GET["count"]);
+            break;
         case "completeTask":
             $value = SetTaskStatus($_GET["userid"],$_GET["taskid"]);
+            break;
+        case "completeGoal":
+            $value = CompleteGoal($_GET["userid"],$_GET["goalid"]);
             break;
         case "getUserInfo":
             $value = GetUserInfo($_GET["userid"]);
             break;
+        case "getUserGoals":
+            $value = GetUserGoals($_GET["userid"]);
+            break;
+        case "GetCityScore":
+            $value = GetCityScore($_GET["city"]);
+            break;
+
     }
     
 }

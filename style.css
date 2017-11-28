@@ -1,11 +1,120 @@
 .center {
     text-align: center;
-    border: 3px solid blue;
+    border: 12px solid green;
+    background-color: white;
+    width: 500px;
+      height: 400px;
+      top: 50%;
+      left: 8%;
+      margin: auto;
+      border-radius: 8px;
 }
 .centerNoBorder {
     text-align: center;
 }
 body {
-    background-color: green;
+    background-color: #4CAF50;
     
+}
+.button {
+    background-color: green; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+}
+.donebutton {
+    background-color: #143a0e; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+.createuserbutton {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+.button:hover {
+    opacity: 0.6;
+    color: white;
+}
+.createuserbutton:hover {
+    opacity: 0.6;
+    color: white;
+}
+.donebutton:hover {
+    opacity: 0.6;
+    color: white;
+}
+.logoheader {
+    font-size: 50px;
+    color: #4CAF50;
+}
+
+.header {
+    font-size: 32px;
+    
+}
+.header1 {
+    font-size: 20px;
+    
+}
+.userinfo {
+    font-size: 20px;
+    border: 1px solid #000000;
+    width: 15%;
+    background-color: white;
+    display: inline;
+
+}
+.returnbutton {
+    background-color: blue; /* Green */
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
+    
+    float: right;
+    width: 300px;
+    padding: 10px;
+}
+.returnbutton:hover {
+    opacity: 0.6;
+    color: white;
+}
+.inputfield {
+
+}
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 4px;
 }
