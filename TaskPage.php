@@ -24,7 +24,6 @@
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 </script>
-<!-- Place this tag in your head or just before your close body tag. -->
 <script src="https://apis.google.com/js/platform.js" async defer></script>
 <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
 
@@ -66,16 +65,20 @@
         header("location: DailyTasks.php");
     }
 
-?>
-<form>
-    <div class="fb-share-button" data-href="https://software-as-a-service-wawethewaras.c9users.io/DailyTasks.php?" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fsoftware-as-a-service-wawethewaras.c9users.io%2FDailyTasks.php&amp;src=sdkpreparse">Share</a></div></body>
-</form>    
-<form>
-<a class="twitter-share-button"
-  href="https://twitter.com/intent/tweet?text=Hello%20world"
-  data-size="large">
+
+echo '<form>
+<div class="fb-share-button" data-href="https://software-as-a-service-wawethewaras.c9users.io/TaskShare.php?taskid='.$_POST['taskid'].'" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fsoftware-as-a-service-wawethewaras.c9users.io%2FTaskShare.php%3Ftaskid%3D0&amp;src=sdkpreparse">Share</a></div></form>    
+<form>';
+
+echo '<a class="twitter-share-button"
+  href="https://twitter.com/intent/tweet?text=Join"
+  data-size="large"
+  <link rel="canonical"
+  href="https://software-as-a-service-wawethewaras.c9users.io/TaskShare.php?taskid='.$_POST['taskid'].'">
+  >
 Tweet</a>
-</form> 
+</form> ';
+?>
 <form>
     <div class="g-plus" data-action="share"></div>
 </form> <br>

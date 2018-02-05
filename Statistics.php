@@ -34,6 +34,8 @@
         
         echo 'City score is ' . $cityStatistics["totalscore"] . '!<br>';
         echo 'Users in city: ' . $cityStatistics["usercount"] . '!<br>';
+        $avergeuserscore = round($cityStatistics["totalscore"] / $cityStatistics["usercount"]);
+        echo 'Averge user score is: ' . $avergeuserscore . '!<br>';
         echo "</div>";
     ?>
     

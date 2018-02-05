@@ -281,7 +281,7 @@ function GetUserInfo($userid){
     $qur = $db->query("INSERT OR IGNORE INTO userinfo  (userid) VALUES ('".$userid."');");
     $qur = $db->query("SELECT * FROM users INNER JOIN userinfo ON users.id = userinfo.userid WHERE users.id = ". $userid);
     while($row = $qur->fetchArray()){
-        $result = array("score" => $row["score"], "city" => $row["city"], "completedtasks" => $row["completedtasks"], "completedgoals" => $row["completedgoals"]);
+        $result = array("name" => $row["name"], "score" => $row["score"], "city" => $row["city"], "completedtasks" => $row["completedtasks"], "completedgoals" => $row["completedgoals"]);
     }
     return $result;
 }

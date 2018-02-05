@@ -15,21 +15,23 @@
         }
     }
 ?>
-
+<form action="Logout.php">
+    <input type="submit" value="Return" class="returnbutton"/>
+</form> 
 <link rel="stylesheet" type="text/css" href="style.css"> 
 <body>
 <div class=center>
     
-    <p class ="header">Create new user</p>
-
+    <div class ="logoheader">Create new user</div>
+    <br>
     <form action="" method="post" > 
-        <p class ="header1">Username:</p>
+        <div class ="header1">Username:</div><br>
         <input type="field" name='username' id='username' placeholder="Username" class ="inputfield"/> <br><br>
         
-        <p class ="header1">Password:</p>
+        <div class ="header1">Password:</div><br>
         <input type="password" name='password' id='password' placeholder="Password" class ="inputfield"/><br><br>
         
-        <p class ="header1">City:</p>
+        <div class ="header1">City:</div><br>
         <input type="field" name='city' id='city' placeholder="City" class ="inputfield"/><br><br>
         <input type="submit" value="Create user" class="createuserbutton"/>
 
@@ -38,9 +40,7 @@
 </div>
 </body>
 <br><br>
-<form action="Logout.php">
-    <input type="submit" value="Return" class="button"/>
-</form> 
+
 <?php 
     // $userinfo = file_get_contents('https://software-as-a-service-wawethewaras.c9users.io/DailyTaskDatabase.php?action=getUserList');
     // $userinfo = json_decode($userinfo, true);
