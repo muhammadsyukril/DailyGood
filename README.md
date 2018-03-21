@@ -1,5 +1,4 @@
-# DailyGood
-Gamified service that promotes doing green activities.
+![dailygood_poster 873](https://user-images.githubusercontent.com/13047572/37723319-cac8d670-2d36-11e8-8563-3421bba6c641.png)
 
 Preview screenshots:
 
